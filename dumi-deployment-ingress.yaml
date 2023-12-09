@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+      name: getmetricsservice
+spec:
+      replicas: 2
+      selector:
+           matchLabels:
+                app: getmetricsservice
+      template:
+          metadata:
+                labels:
+                    app: getmetricsservice
+          spec:
+                containers:
+                    - image: kasuntharu/get_metrics_service
+                      name: getmetricsservice
+                      imagePullPolicy: Always
+                      ports:
+                      - containerPort: 8000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+      name: postmetricsservice
+spec:
+      replicas: 2
+      selector:
+           matchLabels:
+                app: postmetricsservice
+      template:
+          metadata:
+                labels:
+                    app: postmetricsservice
+          spec:
+                containers:
+                    - image: kasuntharu/post_metrics_service
+                      name: postmetricsservice
+                      imagePullPolicy: Always
+                      ports:
+                      - containerPort: 8001
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: getmetricsservice
+spec:
+  selector:
+    app: getmetricsservice
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postmetricsservice
+spec:
+  selector:
+    app: postmetricsservice
+  ports:
+  - protocol: TCP
+    port: 8001
+    targetPort: 8001
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /get
+        pathType: Prefix
+        backend:
+          service:
+            name: getmetricsservice
+            port:
+              number: 8000
+      - path: /post
+        pathType: Prefix
+        backend:
+          service:
+            name: postmetricsservice
+            port:
+              number: 8001

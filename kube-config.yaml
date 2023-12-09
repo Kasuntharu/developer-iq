@@ -1,0 +1,33 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJTVdNam4yeEJVUUF3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TXpFeU1Ea3hPVEl6TXpOYUZ3MHpNekV5TURZeE9USTRNek5hTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUN4d29xMWlQQnhnYU5JMTlIdUg4UjNTckZ6ZmMxa0lrRDRlTnNhSlZMdmhXbm5CKzZFTTkrMkZHUWMKaFpIYUhZTkxzSlVhZnM0UzYvRU1IdENEYk90TUxMdGFobGRQcEtuWjVxcUhYdFBNdzY5N0M1cFZWSWt2a3RENQp2b3dVUDN4R0RVNXVBVnQwa1grTWNVNGp1ODg1NW1wbnd3bTJuZDBaQ3hIcW9SVmhLZVpoUmpOY2JqSndIT05FCkZSa29tcjFvT2gzYlVPdmhBeW82dEN6Zlo5a0ljVGZ6SmhaUklJYkVaaWpLSlRPc0Fwb1loOHRrWmY3VXBGajcKdGMwdTEzaGNoekNhM3NFQmVKSFV0aTNhbXFISEJDZUN0TW5wbFFscDdUbEhvT05PU1ZxN0d5emRUTTZwcHB0bQoxbkxCVzVrN3p6aEx1UGwwQnlod05CQ0FBeG5WQWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJSVUFnZEcvVGczNVlJaUQ0N3lPQ3BxSTI2TG9qQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQXdDSFlUZlY4dgpmS2pmam15TEs5TWw5V3E2cmVCUUhHbXpETVg2RTJhcDlwWnlxNXRJVDNjdU1tT1c0QzRVbmZiS2FvUm43MjN5Cm04YjhLSFcvUnRhN1lPUlR0dzExUE4xbUpaRnlMTFhnR2EvK21rKzFZL2lLanJ0Q1pRdDluVUUyYmdDcmpsQVYKYVNZZFNjS3drSXMvZTEwU0Jua3Y0ZDQvWjRuR0NYMTNQUThpdm5mQitUdkdUQS9ydkI1VUxUZkswMmp5eUdUUwppR24wM3REUEZkaGlZRDB5T3p2K2NZWjJraG1jZFhQS1h5cy9TVkpFZ0MwKzBHQUVoMmtZNndPOTdVNmR0L1VDCjNZSFgvV3Vaa25BR1lGNzhLUWF3QUpJYnVjUUxlUE9jTjRxZDROOVFPUWlZa28yZ3A1cnZ3UnAvWG90V0FEdWoKdVRoN3JpNFRrbUpVCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    server: https://718A386A03662E183846CFC85C5CC0FA.gr7.ap-southeast-1.eks.amazonaws.com
+  name: dev-iq-cluster-dumi.ap-southeast-1.eksctl.io
+contexts:
+- context:
+    cluster: dev-iq-cluster-dumi.ap-southeast-1.eksctl.io
+    user: kasuntharu@dev-iq-cluster-dumi.ap-southeast-1.eksctl.io
+  name: kasuntharu@dev-iq-cluster-dumi.ap-southeast-1.eksctl.io
+current-context: kasuntharu@dev-iq-cluster-dumi.ap-southeast-1.eksctl.io
+kind: Config
+preferences: {}
+users:
+- name: kasuntharu@dev-iq-cluster-dumi.ap-southeast-1.eksctl.io
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - eks
+      - get-token
+      - --output
+      - json
+      - --cluster-name
+      - dev-iq-cluster-dumi
+      - --region
+      - ap-southeast-1
+      command: aws
+      env:
+      - name: AWS_STS_REGIONAL_ENDPOINTS
+        value: regional
+      provideClusterInfo: false
