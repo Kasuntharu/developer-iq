@@ -54,6 +54,17 @@ def get_user_pull_requests(owner: str, repo: str, user: str):
     return [singleEntry for singleEntry in data if isUser(singleEntry, user)]
 
 
+@get_router.get("/getpulls/{owner}/{repo}/user/{user}/summary")
+def get_user_pull_request_summary(owner: str, repo: str, user: str):
+    data = get_item(owner + "-" + repo, "pulls")
+    openpulls = len([singleEntry for singleEntry in data if isUser(singleEntry, user)])
+    totalPulls = len(data)
+    return {
+        "user": user,
+        "total_open_pull_requests": totalPulls,
+        "user_opend_pull_requests": openpulls
+    }
+
 
 
 
