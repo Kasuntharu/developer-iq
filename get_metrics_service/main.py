@@ -46,10 +46,16 @@ def test():
 
 @get_router.get("/getpulls/{owner}/{repo}")
 def get_pull_requests(owner: str, repo: str):
-    return get_item("latest", 'pulls')
+    return get_item(owner + "-" + repo, 'pulls')
 
-def get_user_pull_requests():
-    return "asd"
+@get_router.get("/getpulls/{owner}/{repo}/user/{user}")
+def get_user_pull_requests(owner: str, repo: str, user: str):
+    data = get_item(owner + "-" + repo, "pulls")
+    return [singleEntry for singleEntry in data if isUser(singleEntry, user)]
+
+
+
+
 
 def get_item(p_key: str, type: str):
     table = dynamodb.Table(table_name)

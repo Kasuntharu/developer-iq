@@ -42,12 +42,12 @@ def read_root():
 
 @post_router.get("/init/{owner}/{repo}")
 def test(owner: str, repo: str):
-    data = get_pull_requests(owner, repo)
-    add_item("latest", "pulls", data)
+    data = post_pull_requests(owner, repo)
+    add_item(owner + "-" + repo, "pulls", data)
     return data
 
 @post_router.get("/postpulls/{owner}/{repo}")
-def get_pull_requests(owner: str, repo: str):
+def post_pull_requests(owner: str, repo: str):
     final_data = []
     page = 1
     while True:
@@ -99,6 +99,10 @@ def check_date_time_str_within_x_days(date_time_str: str, limit = 30):
     else:
         # print("not within 30 days")
         return False
+
+
+
+
 
 def add_item(p_key: str, type: str, data: dict ):
     for table in dynamodb.tables.all():
