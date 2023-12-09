@@ -168,8 +168,8 @@ def test():
                     break
             final_data.extend(data[0:data_size-outerIndex])
             break
-    return final_data
-    return len(final_data)
+    # return final_data
+    # return len(final_data)
     add_item("asd2",final_data)
     return get_item("asd2")
 
@@ -206,9 +206,9 @@ def get_item(p_key: str):
     table = dynamodb.Table('dev-iq-metrics')
     response = table.get_item(Key={'id': p_key})
     d = decompress_data(response['Item']['data'].value)
-    # return d
+    return d
     # return [dd.get('url') for dd in d if isUser(dd, 'janicduplessis')]
-    return [dd.get('url') for dd in d if isUser(dd, 'Kasuntharu')]
+    # return [dd.get('url') for dd in d if isUser(dd, 'Kasuntharu')]
 
 def add_item(p_key: str, data: dict ):
     dynamodb = boto3.resource(
@@ -236,7 +236,6 @@ def add_item(p_key: str, data: dict ):
     else:
         print("Error adding item.")
         return "failed"
-
 
 def compress_data(data):
         try:
