@@ -36,7 +36,6 @@ jobs:
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/get_metrics_service:latest
 
   build-service-post:
-    needs: copy-requirements
     runs-on: ubuntu-latest
 
     steps:
