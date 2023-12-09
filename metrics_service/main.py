@@ -9,6 +9,12 @@ import requests
 from pydantic import BaseModel
 import json 
 import boto3
+
+import zlib
+import logging
+from datetime import datetime
+import pytz
+
 app = FastAPI()
 
 
@@ -17,12 +23,12 @@ dynamodb = boto3.resource(
     'dynamodb',
     aws_access_key_id='AKIAWWJOX62Z4QMOXE6S',
     aws_secret_access_key='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',
-    region_name='us-east-1'
+    region_name='ap-southeast-1'
 )
 
 
 GITHUB_USERNAME = "Kasuntharu"
-ACCESS_TOKEN = "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" #remove zzz
+ACCESS_TOKEN = "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"
 
 BASE_URL = "https://api.github.com"
 
@@ -131,15 +137,57 @@ def get_pulls_by_user(owner: str, repo: str, user: str):
 
 @app.get("/dynamodb")
 def test():
-    url = f"https://api.github.com/repos/facebook/react-native/pulls"
+    url = f"https://api.github.com/repos/facebook/react-native/pulls?per_page=10&page=1"
 
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    # return response.json()
-    add_item("asd2",1,response.json())
+    data = response.json()
+
+    date_time_str= data[-1]['created_at']
+    given_date_time = datetime.fromisoformat(date_time_str.replace('Z', '+00:00'))
+
+    # Get the current datetime in UTC
+    current_time = datetime.now(pytz.utc)
+
+    # Compute the difference
+    time_difference = current_time - given_date_time
+
+    # Check if the difference is less than or equal to 30 days
+    if abs(time_difference) <= timedelta(days=30):
+        print("The given date-time is within 30 days from now.")
+        # increment page and continue
+    else:
+        print("The given date-time is not within 30 days from now.")
+        # same page upper elements
+
+
+    # return get_item("asd2")
     
 
-def add_item(p_key: str, sort_key: int, data: dict ):
+def test_old():
+    url = f"https://api.github.com/repos/facebook/react-native/pulls?per_page=100"
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    add_item("asd2",response.json())
+    return get_item("asd2")
+
+def get_item(p_key: str):
+    dynamodb = boto3.resource(
+        'dynamodb',
+        aws_access_key_id='AKIAWWJOX62Z4QMOXE6S',
+        aws_secret_access_key='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',
+        region_name='ap-southeast-1'
+    )
+
+    table = dynamodb.Table('dev-iq-metrics')
+    response = table.get_item(Key={'id': p_key})
+    d = decompress_data(response['Item']['data'].value)
+    # return d
+    # return [dd.get('url') for dd in d if isUser(dd, 'janicduplessis')]
+    return [dd.get('url') for dd in d if isUser(dd, 'Kasuntharu')]
+
+def add_item(p_key: str, data: dict ):
     dynamodb = boto3.resource(
         'dynamodb',
         aws_access_key_id='AKIAWWJOX62Z4QMOXE6S',
@@ -150,13 +198,12 @@ def add_item(p_key: str, sort_key: int, data: dict ):
     for table in dynamodb.tables.all():
         print(f"Table: {table.name}")
 
-    table = dynamodb.Table('dev-metrics')
+    table = dynamodb.Table('dev-iq-metrics')
     
     response = table.put_item(
         Item={
-            'user_name': p_key,
-            'id': sort_key,
-            'data': {'data': data}
+            'id': p_key,
+            'data': compress_data(data)
         }
     )
 
@@ -167,6 +214,22 @@ def add_item(p_key: str, sort_key: int, data: dict ):
         print("Error adding item.")
         return "failed"
 
+
+def compress_data(data):
+        try:
+            serialized_data = json.dumps(data).encode()
+            return zlib.compress(serialized_data)
+        except Exception as e:
+            logging.error(f"Error compressing data: {e}")
+            return None
+
+def decompress_data(compressed_data):
+    try:
+        decompressed_data = zlib.decompress(compressed_data)
+        return json.loads(decompressed_data)
+    except Exception as e:
+        logging.error(f"Error decompressing data: {e}")
+        return None
 
 
 #This is the updated version. this seems right
@@ -219,6 +282,144 @@ def get_repository_metrics(owner: str, repo: str, username: str):
         "issues_resolved": issues_resolved,
         "pull_requests_merged": pull_requests_merged
     }
+
+def isUser(data:dict, user: str) -> bool:
+    return data.get('user', {}).get('login') == user
+
+
+from datetime import datetime, timedelta
+import requests
+
+@app.get("/repository_metrics_month/{owner}/{repo}/{username}")
+def get_repository_metrics(owner: str, repo: str, username: str):
+    try:
+        headers = {
+            "Authorization": f"token {ACCESS_TOKEN}",
+            "Accept": "application/vnd.github.v3+json",
+        }
+
+        # Placeholder variables for metrics
+        commits = 0
+        pull_requests_created = 0
+        issues_resolved = 0
+        pull_requests_merged = 0
+
+        # Calculate 'since' parameter for the past XXX
+        past_month = datetime.utcnow() - timedelta(days=30)
+        since_date = past_month.isoformat()
+
+        # Fetch commits by the specified user within the last month
+        commits_url = f"{BASE_URL}/repos/{owner}/{repo}/commits"
+        params = {
+            "author": username,
+            "since": since_date
+        }
+        commits_info = requests.get(commits_url, headers=headers, params=params).json()
+        commits = len(commits_info)
+
+        # Fetch pull requests created by the specified user within the last month
+        pull_requests_url = f"{BASE_URL}/repos/{owner}/{repo}/pulls"
+        params = {
+            "creator": username,
+            "state": "all",
+            "sort": "created",
+            "direction": "desc",
+            "since": since_date
+        }
+        pull_requests_info = requests.get(pull_requests_url, headers=headers, params=params).json()
+        pull_requests_created = len(pull_requests_info)
+
+        # Fetch issues resolved by the specified user within the last month
+        issues_url = f"{BASE_URL}/repos/{owner}/{repo}/issues"
+        params = {
+            "creator": username,
+            "state": "closed",
+            "sort": "updated",
+            "direction": "desc",
+            "since": since_date
+        }
+        issues_info = requests.get(issues_url, headers=headers, params=params).json()
+        issues_resolved = len(issues_info)
+
+        # Fetch merged pull requests by the specified user within the last month
+        merged_pull_requests_url = f"{BASE_URL}/repos/{owner}/{repo}/pulls"
+        params = {
+            "creator": username,
+            "state": "closed",
+            "sort": "updated",
+            "direction": "desc",
+            "base": "master",
+            "since": since_date
+        }
+        merged_pull_requests_info = requests.get(merged_pull_requests_url, headers=headers, params=params).json()
+        pull_requests_merged = len([pr for pr in merged_pull_requests_info if pr.get('merged_at')])
+
+        # Return metrics
+        return {
+            "repository": f"{owner}/{repo}",
+            "username": username,
+            "commits": commits,
+            "pull_requests_created": pull_requests_created,
+            "issues_resolved": issues_resolved,
+            "pull_requests_merged": pull_requests_merged
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch repository metrics: {str(e)}")
+
+
+
+
+
+
+
+
+
+
+
+from datetime import datetime, timedelta
+import requests
+
+@app.get("/repository_users_all/{owner}/{repo}")
+def get_repository_users(owner: str, repo: str):
+    try:
+        contributors = []
+        page = 1
+        per_page = 100  # Maximum items per page
+        url = f"{BASE_URL}/repos/{owner}/{repo}/contributors"
+
+        # Calculate 'since' parameter for the past month
+        past_month = datetime.utcnow() - timedelta(days=30)
+        since_date = past_month.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        while True:
+            params = {
+                "per_page": per_page,
+                "page": page,
+                "since": since_date
+            }
+
+            response = requests.get(url, headers=headers, params=params)
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail="Failed to fetch repository users")
+
+            page_contributors = response.json()
+            contributors.extend([contributor["login"] for contributor in page_contributors])
+
+            if len(page_contributors) < per_page:
+                break  # Reached the last page
+
+            page += 1
+
+        return {
+            "repository": f"{owner}/{repo}",
+            "users": contributors
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch repository users: {str(e)}")
+
+
+
+
 
 
 

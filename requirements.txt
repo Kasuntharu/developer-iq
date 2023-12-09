@@ -4,3 +4,4 @@ python-dotenv
 pydantic-settings
 requests
 boto3
+pytz
