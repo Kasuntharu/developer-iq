@@ -23,4 +23,4 @@ EXPOSE 8000
 ENV PROMETHEUS_MULTIPROC_DIR /tmp
 
 # Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload", "--reload-dir", "/app"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app"]

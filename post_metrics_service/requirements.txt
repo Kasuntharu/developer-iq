@@ -1,7 +1,0 @@
-uvicorn[standard]
-fastapi
-python-dotenv
-pydantic-settings
-requests
-boto3
-requests

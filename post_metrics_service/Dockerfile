@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the app runs on
-EXPOSE 8000
+EXPOSE 8001
 
 # Define environment variable for Prometheus exporter
 ENV PROMETHEUS_MULTIPROC_DIR /tmp

@@ -34,15 +34,19 @@ headers = {
         "Accept": "application/vnd.github.v3+json",
     }
 
+table_name = 'dev-iq-metrics'
+
 @post_router.get("/")
 def read_root():
     return {"Hello": "World"}
 
-@post_router.get("/dynamodb")
-def test():
-    return get_item("latest")
+@post_router.get("/init/{owner}/{repo}")
+def test(owner: str, repo: str):
+    data = get_pull_requests(owner, repo)
+    add_item("latest", "pulls", data)
+    return data
 
-@post_router.get("/getpulls/{owner}/{repo}")
+@post_router.get("/postpulls/{owner}/{repo}")
 def get_pull_requests(owner: str, repo: str):
     final_data = []
     page = 1
@@ -79,7 +83,7 @@ def get_pull_requests(owner: str, repo: str):
                     break
             final_data.extend(data[0:data_size-outerIndex])
             break
-    add_item("latest", "pulls", final_data)
+    return final_data
 
 
 def check_date_time_str_within_x_days(date_time_str: str, limit = 30):
@@ -96,19 +100,11 @@ def check_date_time_str_within_x_days(date_time_str: str, limit = 30):
         # print("not within 30 days")
         return False
 
-def get_item(p_key: str):
-    table = dynamodb.Table('dev-iq-metrics')
-    response = table.get_item(Key={'id': p_key})
-    d = decompress_data(response['Item']['data'].value)
-    return d
-    # return [dd.get('url') for dd in d if isUser(dd, 'janicduplessis')]
-    # return [dd.get('url') for dd in d if isUser(dd, 'Kasuntharu')]
-
 def add_item(p_key: str, type: str, data: dict ):
     for table in dynamodb.tables.all():
         print(f"Table: {table.name}")
 
-    table = dynamodb.Table('dev-iq-metrics')
+    table = dynamodb.Table(table_name)
     
     response = table.put_item(
         Item={
@@ -132,18 +128,6 @@ def compress_data(data):
         except Exception as e:
             logging.error(f"Error compressing data: {e}")
             return None
-
-def decompress_data(compressed_data):
-    try:
-        decompressed_data = zlib.decompress(compressed_data)
-        return json.loads(decompressed_data)
-    except Exception as e:
-        logging.error(f"Error decompressing data: {e}")
-        return None
-
-def isUser(data:dict, user: str) -> bool:
-    return data.get('user', {}).get('login') == user
-
 
 app = FastAPI()
 app.include_router(post_router)
