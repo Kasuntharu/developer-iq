@@ -137,32 +137,55 @@ def get_pulls_by_user(owner: str, repo: str, user: str):
 
 @app.get("/dynamodb")
 def test():
-    url = f"https://api.github.com/repos/facebook/react-native/pulls?per_page=10&page=1"
+    final_data = []
+    page = 1
+    while True:
+        url = f"https://api.github.com/repos/facebook/react-native/pulls?per_page=16&page={page}"
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        data_size = len(data)
+        date_time_str= data[-1]['created_at']
+        given_date_time = datetime.fromisoformat(date_time_str.replace('Z', '+00:00'))
+        # Get the current datetime in UTC
+        current_time = datetime.now(pytz.utc)
+        # Compute the difference
+        time_difference = current_time - given_date_time
+        # Check if the difference is less than or equal to 30 days
+        if abs(time_difference) <= timedelta(days=30):
+            print("The given date-time is within 30 days from now.")
+            # increment page and continue
+            final_data.extend(data)
+            page+=1
+            continue
+        else:
+            print("The given date-time is not within 30 days from now.")
+            # same page upper elements
+            outerIndex = 0
+            for index, item in enumerate(reversed(data)):
+                if(check_date_time_str_within_x_days(item['created_at'])):
+                    outerIndex = index
+                    break
+            final_data.extend(data[0:data_size-outerIndex])
+            break
+    return final_data
+    return len(final_data)
+    add_item("asd2",final_data)
+    return get_item("asd2")
 
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    data = response.json()
-
-    date_time_str= data[-1]['created_at']
+def check_date_time_str_within_x_days(date_time_str: str, limit = 30):
     given_date_time = datetime.fromisoformat(date_time_str.replace('Z', '+00:00'))
-
-    # Get the current datetime in UTC
+        # Get the current datetime in UTC
     current_time = datetime.now(pytz.utc)
-
     # Compute the difference
     time_difference = current_time - given_date_time
-
     # Check if the difference is less than or equal to 30 days
-    if abs(time_difference) <= timedelta(days=30):
-        print("The given date-time is within 30 days from now.")
-        # increment page and continue
+    if abs(time_difference) <= timedelta(days=limit):
+        # print("within 30 days")
+        return True
     else:
-        print("The given date-time is not within 30 days from now.")
-        # same page upper elements
-
-
-    # return get_item("asd2")
-    
+        # print("not within 30 days")
+        return False
 
 def test_old():
     url = f"https://api.github.com/repos/facebook/react-native/pulls?per_page=100"
