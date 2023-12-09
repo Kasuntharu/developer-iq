@@ -6,23 +6,16 @@ on:
 
 jobs:
 
-  copy-requirements:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v3
-      - name: copy to get_metrics_service
-        run: cp ./requirements.txt ./get_metrics_service
-      - name: copy to post_metrics_service
-        run: cp ./requirements.txt ./post_metrics_service
-
-
   build-service-get:
-    needs: copy-requirements
     runs-on: ubuntu-latest
 
     steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+
+    - name: copy to get_metrics_service
+      run: cp ./requirements.txt ./get_metrics_service
+
     - name: Login to Docker Hub
       uses: docker/login-action@v1
       with:
@@ -47,6 +40,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+
+    - name: copy to post_metrics_service
+      run: cp ./requirements.txt ./post_metrics_service
+
     - name: Login to Docker Hub
       uses: docker/login-action@v1
       with:
