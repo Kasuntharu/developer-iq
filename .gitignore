@@ -1,0 +1,3 @@
+deviq
+*.pyc
+**/.env

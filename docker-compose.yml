@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  commit_service:
+    build: ./commit_service
+    # command: uvicorn commit_service.main:app --port 8001 --reload
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./commit_service:/app  # Mount only the commit_service directory
+
+
+  pullrequest_service:
+    build: ./pullRequest_service
+    # command: uvicorn pullRequest_service.main:app --port 8002 --reload
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./pullRequest_service:/app
+
