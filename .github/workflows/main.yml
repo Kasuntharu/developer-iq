@@ -84,7 +84,7 @@ jobs:
         aws eks --region ap-southeast-1 update-kubeconfig --name dev-iq-cluster-dumi
 
     - name: restart getmetricsservice
-      run: kubectl rollout restart deployment/get_metrics_service
+      run: kubectl rollout restart deployment/getmetricsservice
 
     - name: restart postmetricsservice
-      run: kubectl rollout restart deployment/post_metrics_service
+      run: kubectl rollout restart deployment/postmetricsservice
