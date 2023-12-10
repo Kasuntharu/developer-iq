@@ -49,7 +49,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 
 ### Create EKS cluster
 
-eksctl create cluster  --region ap-southeast-1 --node-type t3.small  --nodes 2  --nodes-min 1  --nodes-max 4 --name dev-iq-cluster-dumi --kubeconfig=/workspace/developer-iq
+eksctl create cluster  --region ap-southeast-1 --node-type t3.small  --nodes 2  --nodes-min 1  --nodes-max 4 --name dev-iq-cluster-dumi --kubeconfig=/workspace/developer-iq/kube-config.yaml
 
 ----
 
@@ -58,9 +58,13 @@ aws eks update-kubeconfig --region ap-southeast-1 --name dev-iq-cluster-dumi
 
 ---set environment variable
 
-set KUBECONFIG= /workspace/developer-iq/kube-config.yaml
+set KUBECONFIG=/workspace/developer-iq/kube-config.yaml
 
 ----run deployment file
+kubectl apply -f app-secrets.yaml
+
+kubectl apply -f dumi-deployment-loadbalancer.yaml
+
 kubectl apply -f /workspace/developer-iq/deployment.yaml
 
 ----update
@@ -95,3 +99,6 @@ kubectl delete pods --all
 kubectl delete services --all
 kubectl delete deployments --all && kubectl delete pods --all && kubectl delete services --all
 
+
+### delete the EKS cluster
+eksctl delete cluster --name dev-iq-cluster-dumi --region ap=southeast-1
