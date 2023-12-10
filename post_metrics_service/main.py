@@ -44,6 +44,10 @@ def read_root():
 def test(owner: str, repo: str):
     data = post_pull_requests(owner, repo)
     add_item(owner + "-" + repo, "pulls", data)
+    data = post_commits(owner, repo)
+    add_item(owner + "-" + repo, "commits", data)
+    data = post_issues(owner, repo)
+    add_item(owner + "-" + repo, "issues", data)
     return data
 
 @post_router.get("/postpulls/{owner}/{repo}")
@@ -84,6 +88,123 @@ def post_pull_requests(owner: str, repo: str):
             final_data.extend(data[0:data_size-outerIndex])
             break
     return final_data
+
+@post_router.get("/postcommits/{owner}/{repo}")
+def post_commits(owner: str, repo: str):
+    final_data = []
+    page = 1
+    while True:
+        url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+        params = {
+            "per_page": "100",
+            "page": page
+        }
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        data_size = len(data)
+        date_time_str= data[-1]['commit']['author']['date']
+        given_date_time = datetime.fromisoformat(date_time_str.replace('Z', '+00:00'))
+        # Get the current datetime in UTC
+        current_time = datetime.now(pytz.utc)
+        # Compute the difference
+        time_difference = current_time - given_date_time
+        # Check if the difference is less than or equal to 30 days
+        if abs(time_difference) <= timedelta(days=30):
+            # print("The given date-time is within 30 days from now.")
+            # increment page and continue
+            final_data.extend(data)
+            page+=1
+            continue
+        else:
+            # print("The given date-time is not within 30 days from now.")
+            # same page upper elements
+            outerIndex = 0
+            for index, item in enumerate(reversed(data)):
+                if(check_date_time_str_within_x_days(item['commit']['author']['date'])):
+                    outerIndex = index
+                    break
+            final_data.extend(data[0:data_size-outerIndex])
+            break
+    return final_data
+
+
+@post_router.get("/postissues/{owner}/{repo}")
+def post_issues(owner: str, repo: str):
+    final_data = []
+    page = 1
+    while True:
+        url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+        params = {
+            "per_page": "100",
+            "page": page
+        }
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        data_size = len(data)
+        date_time_str= data[-1]['created_at']
+        given_date_time = datetime.fromisoformat(date_time_str.replace('Z', '+00:00'))
+        # Get the current datetime in UTC
+        current_time = datetime.now(pytz.utc)
+        # Compute the difference
+        time_difference = current_time - given_date_time
+        # Check if the difference is less than or equal to 30 days
+        if abs(time_difference) <= timedelta(days=30):
+            # print("The given date-time is within 30 days from now.")
+            # increment page and continue
+            final_data.extend(data)
+            page+=1
+            continue
+        else:
+            # print("The given date-time is not within 30 days from now.")
+            # same page upper elements
+            outerIndex = 0
+            for index, item in enumerate(reversed(data)):
+                if(check_date_time_str_within_x_days(item['created_at'])):
+                    outerIndex = index
+                    break
+            final_data.extend(data[0:data_size-outerIndex])
+            break
+
+    page = 1
+    while True:
+        url = f"https://api.github.com/repos/{owner}/{repo}/issues"
+        params = {
+            "per_page": "100",
+            "page": page,
+            "state": "closed"
+        }
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        data_size = len(data)
+        date_time_str= data[-1]['created_at']
+        given_date_time = datetime.fromisoformat(date_time_str.replace('Z', '+00:00'))
+        # Get the current datetime in UTC
+        current_time = datetime.now(pytz.utc)
+        # Compute the difference
+        time_difference = current_time - given_date_time
+        # Check if the difference is less than or equal to 30 days
+        if abs(time_difference) <= timedelta(days=30):
+            # print("The given date-time is within 30 days from now.")
+            # increment page and continue
+            final_data.extend(data)
+            page+=1
+            continue
+        else:
+            # print("The given date-time is not within 30 days from now.")
+            # same page upper elements
+            outerIndex = 0
+            for index, item in enumerate(reversed(data)):
+                if(check_date_time_str_within_x_days(item['created_at'])):
+                    outerIndex = index
+                    break
+            final_data.extend(data[0:data_size-outerIndex])
+            break
+    
+    return final_data
+
 
 
 def check_date_time_str_within_x_days(date_time_str: str, limit = 30):
