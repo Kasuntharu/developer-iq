@@ -65,7 +65,6 @@ kubectl apply -f app-secrets.yaml
 
 kubectl apply -f dumi-deployment-loadbalancer.yaml
 
-kubectl apply -f /workspace/developer-iq/deployment.yaml
 
 ----update
 kubectl config set-context --current --namespace=dev-iq
