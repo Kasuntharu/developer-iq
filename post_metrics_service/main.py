@@ -46,6 +46,8 @@ def test(owner: str, repo: str):
     add_item(owner + "-" + repo, "commits", data)
     data = post_issues(owner, repo)
     add_item(owner + "-" + repo, "issues", data)
+    data = post_contributors(owner, repo)
+    add_item(owner + "-" + repo, "contributors", data)
     return data
 
 @post_router.get("/postpulls/{owner}/{repo}")
@@ -203,6 +205,17 @@ def post_issues(owner: str, repo: str):
     
     return final_data
 
+@post_router.get("/postcollaborators/{owner}/{repo}")
+def post_contributors(owner: str, repo: str):
+    url = f"https://api.github.com/repos/{owner}/{repo}/contributors"
+    params = {
+        "per_page": "100",
+        "page": "1"
+    }
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+    data = response.json()
+    return data
 
 
 def check_date_time_str_within_x_days(date_time_str: str, limit = 30):
@@ -224,9 +237,6 @@ def check_date_time_str_within_x_days(date_time_str: str, limit = 30):
 
 
 def add_item(p_key: str, type: str, data: dict ):
-    for table in dynamodb.tables.all():
-        print(f"Table: {table.name}")
-
     table = dynamodb.Table(table_name)
     
     response = table.put_item(
