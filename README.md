@@ -10,9 +10,10 @@ Run Below in root
 `python main.py`
 
 \
-### To run inside each microservice
+### To run inside each microservice after navigating in to each microservices
 \
 `uvicorn main:app --port 8001 --reload`
+`uvicorn main:app --port 8002 --reload`
 
 ### Below environment variables should set before starting the microservices
 - AWS_ACCESS_KEY
@@ -50,7 +51,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 ### set aws credentials
  `aws configure`
 
-### Create EKS cluster
+### Create EKS cluster (Run only one time)
 
 eksctl create cluster  --region ap-southeast-1 --node-type t3.small  --nodes 2  --nodes-min 1  --nodes-max 4 --name dev-iq-cluster-dumi --kubeconfig=/workspace/developer-iq/kube-config.yaml
 
@@ -102,9 +103,9 @@ kubectl delete services --all
 kubectl delete deployments --all && kubectl delete pods --all && kubectl delete services --all
 
 
-### delete the EKS cluster
+### delete the EKS cluster in a case of faliure 
 eksctl delete cluster --name dev-iq-cluster-dumi --region ap=southeast-1
 
-### redeploy
+### redeploy following is added to the deployment yaml file for demonstrate CI/CD Architecture
 kubectl rollout restart deployment/getmetricsservice
 kubectl rollout restart deployment/postmetricsservice
