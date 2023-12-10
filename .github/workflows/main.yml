@@ -85,3 +85,6 @@ jobs:
 
     - name: restart getmetricsservice
       run: kubectl rollout restart deployment/getmetricsservice
+
+    - name: restart getmetricsservice
+      run: kubectl rollout restart deployment/postmetricsservice
