@@ -1,11 +1,6 @@
-from typing import Union , Optional
-from fastapi import Query
-from fastapi.responses import JSONResponse
-from fastapi import FastAPI, HTTPException  # Importing HTTPException
 import uvicorn
 from fastapi import FastAPI, APIRouter
 import requests
-from pydantic import BaseModel
 import json 
 import boto3
 import zlib
