@@ -91,6 +91,10 @@ def get_user_commit_summary(owner: str, repo: str, user: str):
         "user_commits": user_commits
     }
 
+@get_router.get("/getcontributors/{owner}/{repo}")
+def get_contributors(owner: str, repo: str):
+    return get_item(owner + "-" + repo, 'contributors')
+
 
 @get_router.get("/getissues/{owner}/{repo}")
 def get_issues(owner: str, repo: str):
