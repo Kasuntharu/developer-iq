@@ -49,7 +49,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 
 ### Create EKS cluster
 
-eksctl create cluster  --region ap-southeast-1 --node-type t3.small  --nodes 2  --nodes-min 1  --nodes-max 4 --name dev-iq-cluster-dumi --kubeconfig= /workspace/developer-iq
+eksctl create cluster  --region ap-southeast-1 --node-type t3.small  --nodes 2  --nodes-min 1  --nodes-max 4 --name dev-iq-cluster-dumi --kubeconfig=/workspace/developer-iq
 
 ----
 
