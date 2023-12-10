@@ -21,6 +21,9 @@ Run Below in root
 - GITHUB_USERNAME
 - GITHUB_ACCESS_TOKEN
 
+### Base64 encoding
+encoding should be done before setting env variables to secrets.yaml
+`echo -n text-to-encode | base64`
 
 ### Install kubectl
 ```curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"```
