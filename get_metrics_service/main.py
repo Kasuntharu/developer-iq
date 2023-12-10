@@ -57,12 +57,87 @@ def get_user_pull_requests(owner: str, repo: str, user: str):
 @get_router.get("/getpulls/{owner}/{repo}/user/{user}/summary")
 def get_user_pull_request_summary(owner: str, repo: str, user: str):
     data = get_item(owner + "-" + repo, "pulls")
-    openpulls = len([singleEntry for singleEntry in data if isUser(singleEntry, user)])
-    totalPulls = len(data)
+    open_pulls = len([singleEntry for singleEntry in data if isUser(singleEntry, user)])
+    total_Pulls = len(data)
     return {
         "user": user,
-        "total_open_pull_requests": totalPulls,
-        "user_opend_pull_requests": openpulls
+        "total_open_pull_requests": total_Pulls,
+        "user_opend_pull_requests": open_pulls
+    }
+
+
+@get_router.get("/getcommits/{owner}/{repo}")
+def get_commits(owner: str, repo: str):
+    return get_item(owner + "-" + repo, 'commits')
+
+@get_router.get("/getcommits/{owner}/{repo}/user/{user}")
+def get_user_commits(owner: str, repo: str, user: str):
+    data = get_item(owner + "-" + repo, "commits")
+    return [singleEntry for singleEntry in data if isUser(singleEntry, user)]
+
+
+@get_router.get("/getcommits/{owner}/{repo}/user/{user}/summary")
+def get_user_commit_summary(owner: str, repo: str, user: str):
+    data = get_item(owner + "-" + repo, "commits")
+    user_commits = len([singleEntry for singleEntry in data if isUser(singleEntry, user)])
+    total_commits = len(data)
+    return {
+        "user": user,
+        "total_repo_commits": total_commits,
+        "user_commits": user_commits
+    }
+
+
+@get_router.get("/getissues/{owner}/{repo}")
+def get_issues(owner: str, repo: str):
+    return get_item(owner + "-" + repo, 'issues')
+
+@get_router.get("/getissues/{owner}/{repo}/user/{user}")
+def get_user_issues(owner: str, repo: str, user: str):
+    data = get_item(owner + "-" + repo, "issues")
+    return [singleEntry for singleEntry in data if isUser(singleEntry, user)]
+
+
+@get_router.get("/getissues/{owner}/{repo}/user/{user}/summary")
+def get_user_issues_summary(owner: str, repo: str, user: str):
+    data = get_item(owner + "-" + repo, "issues")
+    user_issues = [singleEntry for singleEntry in data if isUser(singleEntry, user)]
+    user_issues_len = len(user_issues)
+    total_issues = len(data)
+    user_closed_issues = [singleEntry for singleEntry in user_issues if isIssueClosed(singleEntry)]
+    user_closed_issues_len = len(user_closed_issues)
+
+    # Initialize total_time as a timedelta object
+    total_time = timedelta()
+    # Count the number of issues processed
+    count = 0
+    average_time = 0
+
+    for issue in user_closed_issues:
+        if "closed_at" in issue and "created_at" in issue:
+            created_at = parse_iso_datetime(issue["created_at"])
+            closed_at = parse_iso_datetime(issue["closed_at"])
+            total_time += closed_at - created_at
+            count += 1
+    
+    if count > 0:
+        average_time = total_time / count
+        print(f"Average time to close issue: {average_time}")
+        total_seconds = int(average_time.total_seconds())
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        delta_str = f"{hours} hours, {minutes} minutes, {seconds} seconds"
+    else:
+        print("No issues with close times found.") 
+
+    return {
+        "user": user,
+        "total_repo_issues": total_issues,
+        "user_issues": user_issues_len,
+        "user_closed_issues_count": user_closed_issues_len,
+        "average_time_to_close_issue": str(average_time) + " (" + delta_str + ")" ,
+        "user_closed_issues": user_closed_issues
     }
 
 
@@ -85,6 +160,12 @@ def decompress_data(compressed_data):
 def isUser(data:dict, user: str) -> bool:
     return data.get('user', {}).get('login') == user
 
+def isIssueClosed(data:dict) -> bool:
+    return data.get('state', {}) == "closed"
+
+# Function to parse ISO 8601 formatted datetime strings
+def parse_iso_datetime(dt_str):
+    return datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
 
 app = FastAPI()
 app.include_router(get_router)
