@@ -18,7 +18,32 @@ spec:
                       imagePullPolicy: Always
                       ports:
                       - containerPort: 8000
-
+                      env:
+                      - name: AWS_ACCESS_KEY
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: AWS_ACCESS_KEY
+                      - name: AWS_SECRET_KEY
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: AWS_SECRET_KEY
+                      - name: AWS_REGION
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: AWS_REGION
+                      - name: GITHUB_USERNAME
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: GITHUB_USERNAME  
+                      - name: GITHUB_ACCESS_TOKEN
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: GITHUB_ACCESS_TOKEN
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,6 +65,32 @@ spec:
                       imagePullPolicy: Always
                       ports:
                       - containerPort: 8001
+                      env:
+                      - name: AWS_ACCESS_KEY
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: AWS_ACCESS_KEY
+                      - name: AWS_SECRET_KEY
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: AWS_SECRET_KEY
+                      - name: AWS_REGION
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: AWS_REGION
+                      - name: GITHUB_USERNAME
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: GITHUB_USERNAME  
+                      - name: GITHUB_ACCESS_TOKEN
+                        valueFrom:
+                              secretKeyRef:
+                                    name: secrets
+                                    key: GITHUB_ACCESS_TOKEN
 
 ---
 apiVersion: v1
