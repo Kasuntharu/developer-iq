@@ -47,6 +47,9 @@ tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
 
 sudo mv /tmp/eksctl /usr/local/bin
 
+### set aws credentials
+ `aws configure`
+
 ### Create EKS cluster
 
 eksctl create cluster  --region ap-southeast-1 --node-type t3.small  --nodes 2  --nodes-min 1  --nodes-max 4 --name dev-iq-cluster-dumi --kubeconfig=/workspace/developer-iq/kube-config.yaml
