@@ -36,6 +36,8 @@ curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$
 
 tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
 
+sudo mv /tmp/eksctl /usr/local/bin
+
 ### Create EKS cluster
 
 eksctl create cluster  --region ap-southeast-1 --node-type t3.small  --nodes 2  --nodes-min 1  --nodes-max 4 --name dev-iq-cluster-dumi --kubeconfig= /workspace/developer-iq
@@ -73,6 +75,9 @@ kubectl get deployments
 ---describe deployments
 kubectl describe deployments
 
+
+--aws load balancer controller install guide
+https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
 
 -----roleout deployment
 kubectl set image deployment/my-app my-app=my-app:new-version --record
