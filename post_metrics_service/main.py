@@ -1,11 +1,7 @@
-from typing import Union , Optional
-from fastapi import Query
-from fastapi.responses import JSONResponse
-from fastapi import FastAPI, HTTPException  # Importing HTTPException
 import uvicorn
 from fastapi import FastAPI, APIRouter
 import requests
-from pydantic import BaseModel
+import sys
 import json 
 import boto3
 import zlib
@@ -13,21 +9,23 @@ import logging
 from datetime import datetime, timedelta
 import pytz
 
+sys.path.insert(0, '/config/')
+
+from config.config import settings
+
 post_router = APIRouter(prefix="/post")
 
 # Initialize DynamoDB client with explicit credentials
 dynamodb = boto3.resource(
     'dynamodb',
-    aws_access_key_id='AKIAWWJOX62Z4QMOXE6S',
-    aws_secret_access_key='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',
-    region_name='ap-southeast-1'
+    aws_access_key_id=settings.AWS_ACCESS_KEY,
+    aws_secret_access_key=settings.AWS_SECRET_KEY,
+    region_name=settings.AWS_REGION
 )
 
 
-GITHUB_USERNAME = "Kasuntharu"
-ACCESS_TOKEN = "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"
-
-BASE_URL = "https://api.github.com"
+GITHUB_USERNAME = settings.GITHUB_USERNAME
+ACCESS_TOKEN = settings.GITHUB_ACCESS_TOKEN
 
 headers = {
         "Authorization": f"token {ACCESS_TOKEN}",

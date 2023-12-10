@@ -1,7 +1,6 @@
 # developer-iq
 ## sub 
-Track productivity of Developer
-App for track developer productivity
+Application for tracking developer productivity using Gihub REST API
 
 ## Development setup
 Run Below in root
@@ -14,6 +13,13 @@ Run Below in root
 ### To run inside each microservice
 \
 `uvicorn main:app --port 8001 --reload`
+
+### Below environment variables should set before starting the microservices
+- AWS_ACCESS_KEY
+- AWS_SECRET_KEY
+- AWS_REGION
+- GITHUB_USERNAME
+- GITHUB_ACCESS_TOKEN
 
 
 ### Install kubectl
@@ -79,39 +85,10 @@ kubectl describe deployments
 --aws load balancer controller install guide
 https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
 
------roleout deployment
-kubectl set image deployment/my-app my-app=my-app:new-version --record
-kubectl rollout status deployment/californiavoters-app
-kubectl rollout undo deployment/californiavoters-app
-kubectl rollout pause deployment/californiavoters-app
-kubectl rollout resume deployment/californiavoters-app
-
-
 kubectl get deploy && kubectl get rs && kubectl get pod && kubectl get svc
 
 kubectl delete deployments --all
 kubectl delete pods --all
 kubectl delete services --all
-
-
 kubectl delete deployments --all && kubectl delete pods --all && kubectl delete services --all
-
-- name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build, tag, and push the image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-        IMAGE_TAG: "latest"
-
-      run: |
-        # Build a docker container and push it to ECR 
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        echo "Pushing image to ECR..."
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
 

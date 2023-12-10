@@ -12,21 +12,25 @@ import zlib
 import logging
 from datetime import datetime, timedelta
 import pytz
+import sys
+
+sys.path.insert(0, '/config/')
+
+from config.config import settings
 
 get_router = APIRouter(prefix="/get")
 
 # Initialize DynamoDB client with explicit credentials
 dynamodb = boto3.resource(
     'dynamodb',
-    aws_access_key_id='AKIAWWJOX62Z4QMOXE6S',
-    aws_secret_access_key='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',
-    region_name='ap-southeast-1'
+    aws_access_key_id=settings.AWS_ACCESS_KEY,
+    aws_secret_access_key=settings.AWS_SECRET_KEY,
+    region_name=settings.AWS_REGION
 )
 
-GITHUB_USERNAME = "Kasuntharu"
-ACCESS_TOKEN = "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"
 
-BASE_URL = "https://api.github.com"
+GITHUB_USERNAME = settings.GITHUB_USERNAME
+ACCESS_TOKEN = settings.GITHUB_ACCESS_TOKEN
 
 headers = {
         "Authorization": f"token {ACCESS_TOKEN}",
