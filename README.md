@@ -102,3 +102,7 @@ kubectl delete deployments --all && kubectl delete pods --all && kubectl delete 
 
 ### delete the EKS cluster
 eksctl delete cluster --name dev-iq-cluster-dumi --region ap=southeast-1
+
+### redeploy
+kubectl rollout restart deployment/getmetricsservice
+kubectl rollout restart deployment/postmetricsservice
