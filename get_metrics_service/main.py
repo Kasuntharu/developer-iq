@@ -116,6 +116,7 @@ def get_user_issues_summary(owner: str, repo: str, user: str):
     # Count the number of issues processed
     count = 0
     average_time = 0
+    delta_str=""
 
     for issue in user_closed_issues:
         if "closed_at" in issue and "created_at" in issue:
