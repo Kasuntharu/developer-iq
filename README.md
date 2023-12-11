@@ -1,19 +1,17 @@
-# developer-iq
-## sub 
-Application for tracking developer productivity using Gihub REST API
+# developer-iq Run Book
+# Application for tracking developer productivity using Gihub REST API (Recomended for using a linux environment)
 
 ## Development setup
-Run Below in root
-\
-`pip install -r requirements.txt`
-\
-`python main.py`
 
-\
-### To run inside each microservice after navigating in to each microservices
-\
-`uvicorn main:app --port 8001 --reload`
-`uvicorn main:app --port 8002 --reload`
+--- Clone the Repository using git client
+
+git clone https://github.com/Kasuntharu/developer-iq.git
+
+--- Create a virtual environment python
+python -m venv dev-iq
+
+---Install the requirement.txt
+Follow the link ```https://fastapi.tiangolo.com/``` for further referance
 
 ### Below environment variables should set before starting the microservices
 - AWS_ACCESS_KEY
@@ -22,8 +20,16 @@ Run Below in root
 - GITHUB_USERNAME
 - GITHUB_ACCESS_TOKEN
 
+\
+### To run inside each microservice after navigating in to each microservices
+\
+`uvicorn main:app --port 8001 --reload`
+`uvicorn main:app --port 8002 --reload`
+
+
+
 ### Base64 encoding
-encoding should be done before setting env variables to secrets.yaml
+encoding should be done before setting env variables to app-secrets.yaml
 `echo -n text-to-encode | base64`
 
 ### Install kubectl
@@ -39,6 +45,7 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 sudo ./aws/install
 
+
 ### Install eksctl
 ARCH=amd64
 PLATFORM=$(uname -s)_$ARCH
@@ -48,8 +55,10 @@ tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
 
 sudo mv /tmp/eksctl /usr/local/bin
 
+
 ### set aws credentials
  `aws configure`
+
 
 ### Create EKS cluster (Run only one time)
 
@@ -58,21 +67,25 @@ eksctl create cluster  --region ap-southeast-1 --node-type t3.small  --nodes 2  
 ----
 
 
+----Update Kubeconfig for AWS EKS:
 aws eks update-kubeconfig --region ap-southeast-1 --name dev-iq-cluster-dumi
 
----set environment variable
+---set environment variables
 
 set KUBECONFIG=/workspace/developer-iq/kube-config.yaml
 
-----run deployment file
-kubectl apply -f app-secrets.yaml
+----Running the deployment file 
+kubectl apply -f app-secrets.yml
 
+
+----
 kubectl apply -f dumi-deployment-loadbalancer.yaml
 
 
 ----update
 kubectl config set-context --current --namespace=dev-iq
 
+### Getting Cluster Information:
 ---get namespaces
 kubectl get namespaces
 
@@ -95,8 +108,10 @@ kubectl describe deployments
 --aws load balancer controller install guide
 https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
 
+
 kubectl get deploy && kubectl get rs && kubectl get pod && kubectl get svc
 
+### Deleting Deployments, Pods, and Services:
 kubectl delete deployments --all
 kubectl delete pods --all
 kubectl delete services --all
@@ -106,6 +121,7 @@ kubectl delete deployments --all && kubectl delete pods --all && kubectl delete 
 ### delete the EKS cluster in a case of faliure 
 eksctl delete cluster --name dev-iq-cluster-dumi --region ap=southeast-1
 
-### redeploy following is added to the deployment yaml file for demonstrate CI/CD Architecture
+### Redeployment (Demonstrate CI/CD Architecture):
+
 kubectl rollout restart deployment/getmetricsservice
 kubectl rollout restart deployment/postmetricsservice
