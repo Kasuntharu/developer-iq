@@ -9,9 +9,8 @@ def run_microservice(service_name, port):
 def main():
     # Define your microservices and their associated ports
     services = [
-        ('commit_service', 8001),
-        ('pullRequest_service', 8002),
-        ('issue_service', 8003),
+        ('get_metrics_service', 8000),
+        ('post_metrics_service', 8001)
     ]
 
     # Create a process for each microservice

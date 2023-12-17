@@ -104,6 +104,7 @@ kubectl get deployments
 ---describe deployments
 kubectl describe deployments
 
+--Getting Error Logs
 kubectl logs -f postmetricsservice-8649d85d66-8mplk
 
 
