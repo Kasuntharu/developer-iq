@@ -104,6 +104,8 @@ kubectl get deployments
 ---describe deployments
 kubectl describe deployments
 
+kubectl logs -f postmetricsservice-8649d85d66-8mplk
+
 
 --aws load balancer controller install guide
 https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html

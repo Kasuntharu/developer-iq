@@ -26,3 +26,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 echo "-----------Done----------"
 
 rm -rf ./aws ./awscliv2.zip ./kubectl
+
+aws eks update-kubeconfig --region ap-southeast-1 --name dev-iq-cluster-dumi
+
+set KUBECONFIG=/workspace/developer-iq/kube-config.yaml
