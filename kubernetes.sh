@@ -24,3 +24,5 @@ echo "Move to the binary folder"
 sudo mv /tmp/eksctl /usr/local/bin
 
 echo "-----------Done----------"
+
+rm -rf ./aws ./awscliv2.zip ./kubectl
